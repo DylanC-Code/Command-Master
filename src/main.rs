@@ -1,5 +1,5 @@
-use std::{env::args, process};
 use anyhow::Result;
+use std::{env::args, process};
 
 pub mod cmd;
 pub mod ia;
@@ -10,7 +10,7 @@ async fn main() -> Result<()> {
 
     match &command[..] {
         "new" => cmd::new_command().await,
-        _ => println!("Unknown command '{command}', try help, -h or --help!")
+        _ => println!("Unknown command '{command}', try help, -h or --help!"),
     };
 
     Ok(())
