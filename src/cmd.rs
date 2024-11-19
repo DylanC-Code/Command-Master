@@ -1,7 +1,8 @@
 use anyhow::Result;
 use rand::Rng;
 use std::env::consts::OS;
-use std::fs::{self, DirEntry};
+use std::fs::{self, DirEntry, OpenOptions};
+use std::io::{stdin, Read};
 use std::process::{self, Command};
 
 use super::ia;
@@ -13,12 +14,16 @@ pub async fn new_command() {
 
     let api_key = ia::get_api_key();
     let chat = ia::chat::ChatAPI::new(api_key);
+
+    println!("Generating for command '{command}' :\r\n...");
+
     let message = chat
         .new_exercise_for_cmd(command, &command_man)
         .await
         .unwrap();
 
-    println!("{message}")
+    println!("{message}");
+//    save_the_command(command);
 }
 
 fn get_commands() -> Result<Vec<String>> {
@@ -110,4 +115,37 @@ fn extract_section(content: &str, section: &str) -> Option<String> {
     };
 
     Some(value)
+}
+
+fn save_the_command(command: &str) {
+    let mut user_response = String::new();
+    if let Err(e) = stdin().read_line(&mut user_response) {
+        panic!("Error reading user input : {e}");
+    };
+
+    if user_response.trim().to_lowercase() != "y" {
+        return;
+    }
+
+    let mut file = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .create(true)
+        .open("saved_commands")
+        .unwrap();
+
+    let mut file_content = String::new();
+    let _ = file.read_to_string(&mut file_content);
+
+    for line in file_content.lines() {
+        let item = line.split(",");
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn save_the_command_should_pass() {
+        //save_the_command("");
+    }
 }
